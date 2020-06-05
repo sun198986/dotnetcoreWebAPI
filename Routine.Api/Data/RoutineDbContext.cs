@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Routine.Api.Entities;
 
@@ -48,6 +49,73 @@ namespace Routine.Api.Data
                 Name = "Ali papa",
                 Introduction = "Zz Company"
             });
+
+            modelBuilder.Entity<Employee>().HasData(
+                new Employee
+                {
+                    Id = Guid.Parse("e56d4dcc-313b-4310-928f-01cc293fd7da"),
+                    CompanyId = Guid.Parse("0d8c6be7-e984-4ade-8997-8a1e67ea0c22"),
+                    DateOfBirth = new DateTime(1986, 11, 4),
+                    EmployeeNo = "G055",
+                    FirstName = "Harry",
+                    LastName = "Miko",
+                    Gender = Gender.男
+                },
+                new Employee
+                {
+                    Id = Guid.Parse("a68c7721-beb7-453d-b9f1-a661a2040ed4"),
+                    CompanyId = Guid.Parse("0d8c6be7-e984-4ade-8997-8a1e67ea0c22"),
+                    DateOfBirth = new DateTime(1976, 5, 6),
+                    EmployeeNo = "G001",
+                    FirstName = "Live",
+                    LastName = "Mai",
+                    Gender = Gender.男
+                }
+            );
+            modelBuilder.Entity<Employee>().HasData(
+                new Employee
+                {
+                    Id = Guid.Parse("2affcefc-9ae1-4bd5-bb6e-6100ab0b4faa"),
+                    CompanyId = Guid.Parse("6fa484b4-26aa-405a-a1f6-7f82092f66b6"),
+                    DateOfBirth = new DateTime(1986, 11, 4),
+                    EmployeeNo = "G016",
+                    FirstName = "Love",
+                    LastName = "Pi",
+                    Gender = Gender.女
+                },
+                new Employee
+                {
+                    Id = Guid.Parse("124bcc74-7bc5-4a25-ad43-e43814014ef9"),
+                    CompanyId = Guid.Parse("6fa484b4-26aa-405a-a1f6-7f82092f66b6"),
+                    DateOfBirth = new DateTime(1976, 5, 6),
+                    EmployeeNo = "G044",
+                    FirstName = "Papa",
+                    LastName = "Richardson",
+                    Gender = Gender.女
+                }
+            );
+            modelBuilder.Entity<Employee>().HasData(
+                new Employee
+                {
+                    Id = Guid.Parse("267b4f39-1641-4387-9e2d-584f5fec4bfd"),
+                    CompanyId = Guid.Parse("658d4ed3-1505-4d02-b9ed-942e2a918e38"),
+                    DateOfBirth = new DateTime(1986, 11, 4),
+                    EmployeeNo = "G003",
+                    FirstName = "Marry",
+                    LastName = "King",
+                    Gender = Gender.女
+                },
+                new Employee
+                {
+                    Id = Guid.Parse("4d143264-be9a-41e7-83d2-a6bd5a0c7e7d"),
+                    CompanyId = Guid.Parse("658d4ed3-1505-4d02-b9ed-942e2a918e38"),
+                    DateOfBirth = new DateTime(1976, 5, 6),
+                    EmployeeNo = "G004",
+                    FirstName = "Kevin",
+                    LastName = "Richardson",
+                    Gender = Gender.男
+                }
+            );
         }
     }
 }

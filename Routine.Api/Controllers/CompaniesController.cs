@@ -4,6 +4,7 @@ using System.Data.SqlTypes;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Routine.Api.DtoParameters;
 using Routine.Api.Medols;
 using Routine.Api.Services;
 
@@ -24,9 +25,12 @@ namespace Routine.Api.Controllers
         }
         
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CompanyDto>>> GetCompanies()
+        [HttpHead]
+        public async Task<ActionResult<IEnumerable<CompanyDto>>> GetCompanies([FromQuery]CompanyDtoParameters parameters)
         {
-            var companies = await _companyRepository.GetCompaniesAsync();
+            //throw  new Exception("An Exception");
+
+            var companies = await _companyRepository.GetCompaniesAsync(parameters);
 
             //var companyDtos = new List<CompanyDto>();
 
@@ -36,7 +40,7 @@ namespace Routine.Api.Controllers
         }
 
         [HttpGet("{companyId}")]//   api/companies/{companyId}
-        public async Task<ActionResult<CompanyDto>> GetCompany(Guid companyId)
+        public async Task<ActionResult<CompanyDto>> GetCompany([FromRoute]Guid companyId)
         {
             var company = await _companyRepository.GetCompanyAsync(companyId);
             if (company == null)
