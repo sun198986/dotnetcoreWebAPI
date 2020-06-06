@@ -32,12 +32,32 @@ namespace Routine.Api
         {
 
             services.AddControllers(setup =>
+                    {
+                        setup.ReturnHttpNotAcceptable = true; //返回accept
+                        //setup.OutputFormatters.Add(new XmlDataContractSerializerOutputFormatter());
+                        //setup.OutputFormatters.Insert(0,new XmlDataContractSerializerOutputFormatter());//顺序决定默认输出
+                    }
+                ).AddXmlDataContractSerializerFormatters()
+                .ConfigureApiBehaviorOptions(setup =>//错误信息输出配置 FluentValidation
                 {
-                    setup.ReturnHttpNotAcceptable = true;//返回accept
-                    //setup.OutputFormatters.Add(new XmlDataContractSerializerOutputFormatter());
-                    //setup.OutputFormatters.Insert(0,new XmlDataContractSerializerOutputFormatter());//顺序决定默认输出
-                }
-            ).AddXmlDataContractSerializerFormatters();
+                    setup.InvalidModelStateResponseFactory = context =>
+                    {
+                        var problemDetail = new ValidationProblemDetails(context.ModelState)
+                        {
+                            Type="www.baidu.com",
+                            Title = "有错误",
+                            Status = StatusCodes.Status422UnprocessableEntity,
+                            Detail = "请看详细信息",
+                            Instance = context.HttpContext.Request.Path
+                        };
+
+                        problemDetail.Extensions.Add("traceId",context.HttpContext.TraceIdentifier);
+                        return new UnprocessableEntityObjectResult(problemDetail)
+                        {
+                            ContentTypes = {"application/problem+json"}
+                        };
+                    };
+                });
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 

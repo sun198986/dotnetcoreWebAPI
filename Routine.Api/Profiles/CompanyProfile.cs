@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Routine.Api.Entities;
-using Routine.Api.Medols;
+using Routine.Api.Models;
 
 namespace Routine.Api.Profiles
 {
@@ -10,6 +10,8 @@ namespace Routine.Api.Profiles
         {
             CreateMap<Company, CompanyDto>().ForMember(dest=>dest.CompanyName,
                 opt=>opt.MapFrom(src=>src.Name));
+
+            CreateMap<CompanyAddDto, Company>();
         }
     }
 }

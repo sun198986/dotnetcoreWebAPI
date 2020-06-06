@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using Routine.Api.Entities;
 
-namespace Routine.Api.Medols
+namespace Routine.Api.Models
 {
     public class EmployeeDto
     {

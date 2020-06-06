@@ -29,7 +29,7 @@ namespace Routine.Api.Services
             var queryExpression = _context.Companies as IQueryable<Company>;
             if (!string.IsNullOrWhiteSpace(parameters.CompanyName))
             {
-                parameters.CompanyName= parameters.CompanyName.Trim();
+                parameters.CompanyName = parameters.CompanyName.Trim();
                 queryExpression = queryExpression.Where(x => x.Name == parameters.CompanyName);
             }
 
@@ -37,7 +37,7 @@ namespace Routine.Api.Services
             {
                 parameters.CompanyName = parameters.SearchTerm.Trim();
                 queryExpression = queryExpression.Where(x => x.Name.Contains(parameters.SearchTerm)
-            ||x.Introduction.Contains(parameters.SearchTerm));
+            || x.Introduction.Contains(parameters.SearchTerm));
             }
 
             return await queryExpression.ToListAsync();
@@ -74,9 +74,14 @@ namespace Routine.Api.Services
             }
 
             company.Id = Guid.NewGuid();
-            foreach (var employee in company.Employees)
+
+            if (company.Employees != null)
             {
-                employee.Id = Guid.NewGuid();
+                foreach (var employee in company.Employees)
+                {
+                    employee.Id = Guid.NewGuid();
+                }
+
             }
 
             _context.Companies.Add(company);
@@ -106,14 +111,14 @@ namespace Routine.Api.Services
             return await _context.Companies.AnyAsync(x => x.Id == companyId);
         }
 
-        public async Task<IEnumerable<Employee>> GetEmployeesAsync(Guid companyId,string genderDisplay,string q)
+        public async Task<IEnumerable<Employee>> GetEmployeesAsync(Guid companyId, string genderDisplay, string q)
         {
             if (companyId == Guid.Empty)
             {
                 throw new ArgumentNullException(nameof(companyId));
             }
 
-            if (string.IsNullOrWhiteSpace(genderDisplay)&&string.IsNullOrWhiteSpace(q))
+            if (string.IsNullOrWhiteSpace(genderDisplay) && string.IsNullOrWhiteSpace(q))
             {
                 return await _context.Employees
                     .Where(x => x.CompanyId == companyId)
@@ -129,7 +134,7 @@ namespace Routine.Api.Services
 
                 items = items.Where(x => x.Gender == gender);
 
-               
+
             }
 
             if (!string.IsNullOrWhiteSpace(q))

@@ -5,7 +5,8 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Routine.Api.DtoParameters;
-using Routine.Api.Medols;
+using Routine.Api.Entities;
+using Routine.Api.Models;
 using Routine.Api.Services;
 
 namespace Routine.Api.Controllers
@@ -20,8 +21,8 @@ namespace Routine.Api.Controllers
 
         public CompaniesController(ICompanyRepository companyRepository,IMapper mapper)
         {
-            _companyRepository = companyRepository?? throw new NullReferenceException(nameof(companyRepository));
-            _mapper = mapper??throw new NullReferenceException(nameof(mapper));
+            _companyRepository = companyRepository?? throw new ArgumentNullException(nameof(companyRepository));
+            _mapper = mapper??throw new ArgumentNullException(nameof(mapper));
         }
         
         [HttpGet]
@@ -39,7 +40,7 @@ namespace Routine.Api.Controllers
             return Ok(companyDtos);
         }
 
-        [HttpGet("{companyId}")]//   api/companies/{companyId}
+        [HttpGet("{companyId}",Name = nameof(GetCompany))]//   api/companies/{companyId}
         public async Task<ActionResult<CompanyDto>> GetCompany([FromRoute]Guid companyId)
         {
             var company = await _companyRepository.GetCompanyAsync(companyId);
@@ -49,6 +50,23 @@ namespace Routine.Api.Controllers
             }
 
             return Ok(_mapper.Map<CompanyDto>(company));
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<CompanyDto>> CreateCompany(CompanyAddDto company)
+        {
+            var entity = _mapper.Map<Company>(company);
+            _companyRepository.AddCompany(entity);
+            await _companyRepository.SaveAsync();
+            var returnDto = _mapper.Map<CompanyDto>(entity);
+            return CreatedAtRoute(nameof(GetCompany), new{companyId= returnDto.Id}, returnDto);
+        }
+
+        [HttpOptions]
+        public IActionResult GetCompaniesOptions()
+        {
+            Response.Headers.Add("Allow","GET,POST,OPTIONS");
+            return Ok();
         }
     }
 }
