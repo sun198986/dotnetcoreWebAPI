@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Serialization;
 using Routine.Api.Data;
 using Routine.Api.Services;
 
@@ -37,7 +38,13 @@ namespace Routine.Api
                         //setup.OutputFormatters.Add(new XmlDataContractSerializerOutputFormatter());
                         //setup.OutputFormatters.Insert(0,new XmlDataContractSerializerOutputFormatter());//顺序决定默认输出
                     }
-                ).AddXmlDataContractSerializerFormatters()
+                )
+                .AddNewtonsoftJson(setup =>
+                {
+                    setup.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                    ;
+                })
+                .AddXmlDataContractSerializerFormatters()
                 .ConfigureApiBehaviorOptions(setup =>//错误信息输出配置 FluentValidation
                 {
                     setup.InvalidModelStateResponseFactory = context =>
