@@ -95,7 +95,7 @@ namespace Routine.Api.Controllers
                 return NotFound();
             }
 
-            await _companyRepository.GetEmployeesAsync(companyId, null, null);
+            await _companyRepository.GetEmployeesAsync(companyId, null);
 
             _companyRepository.DeleteCompany(company);
             await _companyRepository.SaveAsync();

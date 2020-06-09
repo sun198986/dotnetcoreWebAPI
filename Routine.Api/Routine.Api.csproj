@@ -5,6 +5,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\20200609165549_AttachCompanyProperty.cs" />
+    <Compile Remove="Migrations\20200609165549_AttachCompanyProperty.Designer.cs" />
+    <Compile Remove="Migrations\20200609170239_again.cs" />
+    <Compile Remove="Migrations\20200609170239_again.Designer.cs" />
+    <Compile Remove="Migrations\20200609170353_attach.cs" />
+    <Compile Remove="Migrations\20200609170353_attach.Designer.cs" />
+    <Compile Remove="Migrations\20200609171038_attach.cs" />
+    <Compile Remove="Migrations\20200609171038_attach.Designer.cs" />
+    <Compile Remove="Migrations\20200609172318_attach.cs" />
+    <Compile Remove="Migrations\20200609172318_attach.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="3.1.4" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.4" />
@@ -13,6 +26,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.1.2" />
   </ItemGroup>
 
 

@@ -2,21 +2,25 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.JsonPatch.Adapters;
 using Microsoft.EntityFrameworkCore;
 using Routine.Api.Data;
 using Routine.Api.DtoParameters;
 using Routine.Api.Entities;
 using Routine.Api.Helpers;
+using Routine.Api.Models;
 
 namespace Routine.Api.Services
 {
     public class CompanyRepository : ICompanyRepository
     {
         private readonly RoutineDbContext _context;
+        private readonly IPropertyMappingService _propertyMappingService;
 
-        public CompanyRepository(RoutineDbContext context)
+        public CompanyRepository(RoutineDbContext context,IPropertyMappingService propertyMappingService)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
+            _propertyMappingService = propertyMappingService??throw new ArgumentNullException(nameof(propertyMappingService));
         }
 
         public async Task<PagedList<Company>> GetCompaniesAsync(CompanyDtoParameters parameters)
@@ -40,6 +44,9 @@ namespace Routine.Api.Services
 
             //queryExpression = queryExpression.Skip(parameters.PageSize * (parameters.PageNumber - 1))
             //    .Take(parameters.PageSize);
+
+            var mappingDictionary = _propertyMappingService.GetPropertyMapping<CompanyDto, Company>();
+            queryExpression = queryExpression.ApplySort(parameters.OrderBy, mappingDictionary);
 
             return await PagedList<Company>.CreateAsync(queryExpression,parameters.PageNumber,parameters.PageSize);
         }
@@ -112,42 +119,45 @@ namespace Routine.Api.Services
             return await _context.Companies.AnyAsync(x => x.Id == companyId);
         }
 
-        public async Task<IEnumerable<Employee>> GetEmployeesAsync(Guid companyId, string genderDisplay, string q)
+        public async Task<IEnumerable<Employee>> GetEmployeesAsync(Guid companyId, EmployeeDtoParameters parameters)
         {
             if (companyId == Guid.Empty)
             {
                 throw new ArgumentNullException(nameof(companyId));
             }
 
-            if (string.IsNullOrWhiteSpace(genderDisplay) && string.IsNullOrWhiteSpace(q))
-            {
-                return await _context.Employees
-                    .Where(x => x.CompanyId == companyId)
-                    .OrderBy(x => x.EmployeeNo)
-                    .ToListAsync();
-            }
-
             var items = _context.Employees.Where(x => x.CompanyId == companyId);
 
-            if (!string.IsNullOrWhiteSpace(genderDisplay))
+            if (!string.IsNullOrWhiteSpace(parameters.Gender))
             {
-                var gender = Enum.Parse<Gender>(genderDisplay.Trim());
+                var gender = Enum.Parse<Gender>(parameters.Gender.Trim());
 
                 items = items.Where(x => x.Gender == gender);
 
 
             }
 
-            if (!string.IsNullOrWhiteSpace(q))
+            if (!string.IsNullOrWhiteSpace(parameters.Q))
             {
-                q = q.Trim();
-                items = items.Where(x => x.FirstName.Contains(q)
-                                         || x.EmployeeNo.Contains(q)
-                                         || x.LastName.Contains(q));
+                parameters.Q = parameters.Q.Trim();
+                items = items.Where(x => x.FirstName.Contains(parameters.Q)
+                                         || x.EmployeeNo.Contains(parameters.Q)
+                                         || x.LastName.Contains(parameters.Q));
             }
 
-            return await items.OrderBy(x => x.EmployeeNo)
-                .ToListAsync();
+            var mappingDictionary = _propertyMappingService.GetPropertyMapping<EmployeeDto, Employee>();
+
+            items = items.ApplySort(parameters.OrderBy, mappingDictionary);
+
+            //if (!string.IsNullOrWhiteSpace(parameters.OrderBy))
+            //{
+            //    if (parameters.OrderBy.ToLowerInvariant().Equals("name"))
+            //    {
+            //        items = items.OrderBy(x => x.FirstName).ThenBy(x => x.LastName);
+            //    }
+            //}
+
+            return await items.ToListAsync();
         }
 
         public async Task<Employee> GetEmployeeAsync(Guid companyId, Guid employeeId)
