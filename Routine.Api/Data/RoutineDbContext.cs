@@ -31,7 +31,7 @@ namespace Routine.Api.Data
             modelBuilder.Entity<Employee>().HasOne(x => x.Company)
                 .WithMany(x => x.Employees)
                 .HasForeignKey(x => x.CompanyId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Company>().HasData(new Company
             {
