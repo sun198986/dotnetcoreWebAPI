@@ -21,5 +21,7 @@ namespace Routine.Api.DtoParameters
         }
 
         public string OrderBy { get; set; } = "CompanyName";
+
+        public string Fields { get; set; }
     }
 }
