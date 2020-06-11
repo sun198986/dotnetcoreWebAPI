@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
+using Routine.Api.ActionConstraints;
 using Routine.Api.DtoParameters;
 using Routine.Api.Entities;
 using Routine.Api.Helpers;
@@ -174,7 +175,27 @@ namespace Routine.Api.Controllers
             return Ok(_mapper.Map<CompanyDto>(company).shapeData(fields));
         }
 
+        [HttpPost(Name = nameof(CreateCompanyWithBankruptTime))]
+        [RequestHeaderMatchesMediaType("Content-Type", "application/vnd.company.company.companyforcreationwithbankrupttime+json")]
+        [Consumes("application/vnd.company.company.companyforcreationwithbankrupttime+json")]
+        public async Task<ActionResult<CompanyDto>> CreateCompanyWithBankruptTime(CompanyAddWithBankruptTimeDto company)
+        {
+            var entity = _mapper.Map<Company>(company);
+            _companyRepository.AddCompany(entity);
+            await _companyRepository.SaveAsync();
+            var returnDto = _mapper.Map<CompanyDto>(entity);
+
+            var links = CreateLinksForCompany(returnDto.Id, null);
+
+            var linkedDict = returnDto.shapeData(null) as IDictionary<string, object>;
+            linkedDict.Add("link", links);
+
+            return CreatedAtRoute(nameof(GetCompany), new { companyId = linkedDict["Id"] }, linkedDict);
+        }
+
         [HttpPost(Name = nameof(CreateCompany))]
+        [RequestHeaderMatchesMediaType("Content-Type","application/json","application/vnd.company.company.companyforcreation+json")]
+        [Consumes("application/json", "application/vnd.company.company.companyforcreation+json")]
         public async Task<ActionResult<CompanyDto>> CreateCompany(CompanyAddDto company)
         {
             var entity = _mapper.Map<Company>(company);
