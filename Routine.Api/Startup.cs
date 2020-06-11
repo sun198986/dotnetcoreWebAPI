@@ -42,7 +42,6 @@ namespace Routine.Api
                 .AddNewtonsoftJson(setup =>
                 {
                     setup.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-                    ;
                 })
                 .AddXmlDataContractSerializerFormatters()
                 .ConfigureApiBehaviorOptions(setup =>//错误信息输出配置 FluentValidation
@@ -51,20 +50,27 @@ namespace Routine.Api
                     {
                         var problemDetail = new ValidationProblemDetails(context.ModelState)
                         {
-                            Type="www.baidu.com",
+                            Type = "www.baidu.com",
                             Title = "有错误",
                             Status = StatusCodes.Status422UnprocessableEntity,
                             Detail = "请看详细信息",
                             Instance = context.HttpContext.Request.Path
                         };
 
-                        problemDetail.Extensions.Add("traceId",context.HttpContext.TraceIdentifier);
+                        problemDetail.Extensions.Add("traceId", context.HttpContext.TraceIdentifier);
                         return new UnprocessableEntityObjectResult(problemDetail)
                         {
-                            ContentTypes = {"application/problem+json"}
+                            ContentTypes = { "application/problem+json" }
                         };
                     };
                 });
+
+            services.Configure<MvcOptions>(config =>
+            {
+                var newtonSoftJsonOutputFormatter =
+                    config.OutputFormatters.OfType<NewtonsoftJsonOutputFormatter>()?.FirstOrDefault();
+                newtonSoftJsonOutputFormatter?.SupportedMediaTypes.Add("application/vnd.company.hateoas+json");
+            });
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
