@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Marvin.Cache.Headers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -31,10 +32,25 @@ namespace Routine.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            //缓存
+            services.AddHttpCacheHeaders(expires =>
+                {
+                    expires.MaxAge = 60;
+                    expires.CacheLocation = CacheLocation.Private;
+                },
+                validation =>
+                {
+                    validation.MustRevalidate = true;
+                });
 
+        services.AddResponseCaching();
             services.AddControllers(setup =>
                     {
                         setup.ReturnHttpNotAcceptable = true; //返回accept
+                        setup.CacheProfiles.Add("120sCacheProfile",new CacheProfile
+                        {
+                            Duration = 120
+                        });
                         //setup.OutputFormatters.Add(new XmlDataContractSerializerOutputFormatter());
                         //setup.OutputFormatters.Insert(0,new XmlDataContractSerializerOutputFormatter());//顺序决定默认输出
                     }
@@ -103,6 +119,10 @@ namespace Routine.Api
                     });
                 });
             }
+
+            //app.UseResponseCaching();
+
+            app.UseHttpCacheHeaders();
 
             app.UseRouting();
 
